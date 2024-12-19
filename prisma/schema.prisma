@@ -22,7 +22,7 @@ model User {
   id String @id @default(cuid())
 
   username    String  @unique
-  displayName String  
+  displayName String  @map("display_name")
   password    String
   role        Role    @default(USER)
   avatarUrl   String? @map("avatar_url")
@@ -35,13 +35,18 @@ model User {
   followers Follower[]
   chats     Chat[]
   messages  Message[]
-  articles  Article[]
+  posts     Post[]
 
   @@map("users")
 }
 
 model Post {
   id String @id @default(uuid())
+
+  authorId String @map("author_id")
+  author   User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  content String
 
   Like    Like[]
   Comment Comment[]
@@ -103,7 +108,7 @@ model Chat {
 
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")
-  Message   Message[]
+  messages  Message[]
 
   @@map("chats")
 }
@@ -123,18 +128,4 @@ model Message {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("messages")
-}
-
-model Article {
-  id String @id @default(uuid())
-
-  authorId String @map("author_id")
-  author   User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
-
-  content String
-
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  @@map("articles")
 }
